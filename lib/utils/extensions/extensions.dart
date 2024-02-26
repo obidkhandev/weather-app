@@ -16,9 +16,10 @@ extension ParseToStringDate on int {
     return DateFormat.MMMMEEEEd().format(dateTime);
   }
 
+ 
   String getParsedHour() {
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(this * 1000);
-    return DateFormat(" HH:mm ").format(dateTime);
+    return DateFormat("HH").format(dateTime);
   }
 }
 

@@ -55,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 WeatherMainModel? weatherMainModel =
                     (snapshot.data?.data as WeatherMainModel?);
                 if (weatherMainModel != null) {
-                  print("object");
                   return _buildWeatherInfo(weatherMainModel);
                 } else {
                   return Center(

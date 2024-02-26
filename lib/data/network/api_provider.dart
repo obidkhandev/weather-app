@@ -32,7 +32,7 @@ class ApiProvider {
     }
   }
 
-  //  
+  //
   static Future<Response> getComplexWeatherInfo() async {
     Map<String, String> queryParams = {
       "lat": "41.2646",
@@ -44,7 +44,7 @@ class ApiProvider {
 
     Uri uri = Uri.https(
       AppContants.baseUrl,
-      "/data/3.0/onecall",
+      "/data/2.5/onecall",
       queryParams,
     );
 
