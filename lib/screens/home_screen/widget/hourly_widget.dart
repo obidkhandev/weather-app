@@ -23,6 +23,9 @@ class HourlyItemWidget extends StatefulWidget {
 class _HourlyItemWidgetState extends State<HourlyItemWidget> {
   @override
   Widget build(BuildContext context) {
+    bool isDay = false;
+    isDay = 07 <= DateTime.now().hour;
+
     return InkWell(
       onTap: widget.onTap,
       child: Container(
@@ -31,11 +34,14 @@ class _HourlyItemWidgetState extends State<HourlyItemWidget> {
         width: 75.w,
         decoration: BoxDecoration(
           // color: Color(0xff2352CB),
-          gradient: LinearGradient(
-            colors: widget.isActiveColor
-                ? AppColors.linearColor
-                : [Color(0xff2352CB), Color(0xff2352CB)],
-          ),
+          gradient: isDay
+              ? LinearGradient(
+                  colors: widget.isActiveColor
+                      ? AppColors.linearColor
+                      : [Color(0xff2352CB), Color(0xff2352CB)],
+                )
+              : AppColors.night,
+
           borderRadius: BorderRadius.circular(30.r),
         ),
         child: Column(
