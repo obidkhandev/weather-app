@@ -1,10 +1,10 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:weather_app/data/model/detal/one_call_data.dart';
 import 'package:weather_app/data/model/response.dart';
 import 'package:weather_app/data/repository/weather_repository.dart';
 import 'package:weather_app/screens/widget/second_small_weather_info.dart';
-import 'package:weather_app/screens/widget/top_icons.dart';
 import 'package:weather_app/utils/colors/app_colors.dart';
 import 'package:weather_app/utils/extensions/extensions.dart';
 import 'package:weather_app/utils/style/style.dart';
@@ -19,18 +19,31 @@ class TomorrowScreen extends StatefulWidget {
 class _TomorrowScreenState extends State<TomorrowScreen> {
   final WeatherRepository weatherRepository = WeatherRepository();
 
+  bool isDark = false;
+
+  _init() async {
+    isDark = await AdaptiveTheme.getThemeMode() == AdaptiveThemeMode.dark;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     bool isDay = true;
     isDay = 07 <= DateTime.now().hour;
     return Scaffold(
-      backgroundColor: const Color(0xff0C0926),
       body: Column(
         children: [
           Container(
             height: 330.h,
             decoration: BoxDecoration(
-              gradient: isDay
+              gradient: isDay == isDark
                   ? const LinearGradient(
                       colors: AppColors.linearColor,
                     )
@@ -150,10 +163,23 @@ class _TomorrowScreenState extends State<TomorrowScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        TopIcons(
-          onTap: () => Navigator.pop(context),
-          icon: Icons.arrow_back,
+      Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          onPressed: (){
+            Navigator.pop(context);
+
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 30.spMin,
+          ),
         ),
+
+      ],
+    ),
         Text(
           "Tomorrow",
           style: TextStyle(color: Colors.white, fontSize: 18.sp),

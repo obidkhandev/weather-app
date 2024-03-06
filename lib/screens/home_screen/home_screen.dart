@@ -1,3 +1,4 @@
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:weather_app/data/model/detal/one_call_data.dart';
@@ -7,11 +8,11 @@ import 'package:weather_app/data/repository/weather_repository.dart';
 import 'package:weather_app/screens/home_screen/widget/hourly_widget.dart';
 import 'package:weather_app/screens/tomorrow_screen/tomorrow_screen.dart';
 import 'package:weather_app/screens/widget/small_weather_info.dart';
-import 'package:weather_app/screens/widget/top_icons.dart';
 import 'package:weather_app/screens/widget/weather_icon.dart';
 import 'package:weather_app/utils/colors/app_colors.dart';
 import 'package:weather_app/utils/extensions/extensions.dart';
 import 'package:weather_app/utils/style/style.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -22,7 +23,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final WeatherRepository weatherRepository = WeatherRepository();
-  int activeIndex = 0;
+  int activeIndex = -1;
+
+  bool isDark = false;
+
+  _init() async {
+    isDark = await AdaptiveTheme.getThemeMode() == AdaptiveThemeMode.dark;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _init();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
     isDay = 07 <= DateTime.now().hour;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+
       body: Column(
         children: [
           Container(
@@ -47,11 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 bottomLeft: Radius.circular(20.r),
                 bottomRight: Radius.circular(20.r),
               ),
-              gradient:  isDay? const LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: AppColors.secondLinearColor,
-              ): AppColors.night,
+              gradient: isDay == isDark
+                  ? const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: AppColors.secondLinearColor,
+                    )
+                  : AppColors.night,
             ),
             child: FutureBuilder<Response?>(
               future: weatherRepository.getSimpleWeatherInfoget("Tashkent"),
@@ -93,7 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           Padding(
             padding: EdgeInsets.only(
-                left: 10.w, top: 20.h, right: 10.w, bottom: 10.h),
+                left: 10.w, top: 20.h, right: 10.w, bottom: 10.h,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -126,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
             future: weatherRepository.getComplexWeatherInfo(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(
                   child: Text(
@@ -151,15 +168,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       children:
                           List.generate(oneCallData.hourly.length, (index) {
                         var hourly = oneCallData.hourly[index];
-                        return HourlyItemWidget(
-                          hourly: hourly,
+                        return ZoomTapAnimation(
                           onTap: () {
-                            if (mounted) {
-                              activeIndex = index;
-                              // setState(() {});
-                            }
+                            activeIndex = index;
                           },
-                          isActiveColor: activeIndex == index ? true : false,
+                          child: HourlyItemWidget(
+                            hourly: hourly,
+                            color: activeIndex == index
+                                ? AppColors.linearColor
+                                : AppColors.secondLinearColor,
+                            // onTap: () {
+
+                            // },
+                          ),
                         );
                       }),
                     ),
@@ -183,37 +204,30 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildWeatherInfo(WeatherMainModel weatherMainModel) {
     return Column(
       children: [
-        TopIcons(onTap: () {
-          // showAlertDialog(BuildContext context) {
-          //   // set up the buttons
-          //   Widget cancelButton = TextButton(
-          //     child: Text("Cancel"),
-          //     onPressed: () {},
-          //   );
-          //   Widget continueButton = TextButton(
-          //     child: Text("Continue"),
-          //     onPressed: () {},
-          //   );
-
-          //   // set up the AlertDialog
-          //   AlertDialog alert = AlertDialog(
-          //     title: Text("AlertDialog"),
-          //     content: TextFormField(),
-          //     actions: [
-          //       cancelButton,
-          //       continueButton,
-          //     ],
-          //   );
-
-          //   // show the dialog
-          //   showDialog(
-          //     context: context,
-          //     builder: (BuildContext context) {
-          //       return alert;
-          //     },
-          //   );
-          // }
-        }),
+      Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton(
+          onPressed: (){},
+          icon: Icon(
+            Icons.search,
+            color: Colors.white,
+            size: 30.spMin,
+          ),
+        ),
+        Switch(
+          value: isDark,
+          onChanged: (v) async {
+            if (v) {
+              AdaptiveTheme.of(context).setDark();
+            } else {
+              AdaptiveTheme.of(context).setLight();
+            }
+            isDark = v;
+          },
+        ),
+      ],
+    ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
